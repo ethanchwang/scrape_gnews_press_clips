@@ -61,6 +61,8 @@ def add_hyperlink(paragraph, url, text, color, underline):
     # Join all the xml elements together add add the required text to the w:r element
     new_run.append(rPr)
     new_run.text = text
+    new_run.bold = True
+    new_run.name = 'Arial'
     hyperlink.append(new_run)
 
     paragraph._p.append(hyperlink)
@@ -71,7 +73,7 @@ def query_mentions(query:str, time_frame:str, language:str) -> list:
     all_mentions_articles = []
 
     #instantiate GNews object
-    google_news = GNews(period=time_frame,max_results=50)
+    google_news = GNews(period=time_frame,max_results=5)
     google_news.language = language
     query_results = [] + google_news.get_news(query)
 
@@ -118,7 +120,6 @@ def query_mentions(query:str, time_frame:str, language:str) -> list:
         for paragraph in article_text_list:
             if query.title().split(" ")[1] in paragraph:
                 all_mentions_articles[idx].mention_text.append(paragraph)
-                # p = document.add_paragraph(paragraph)
     return all_mentions_articles
 
 def query_topics(topics:list,geographical_area:str) -> list:
@@ -154,40 +155,97 @@ def query_topics(topics:list,geographical_area:str) -> list:
             all_topic_articles[topic][idx].day_num = day_num
             all_topic_articles[topic][idx].publisher = article['publisher']['title']
 
-            # hyperlink = add_hyperlink(p, article['url'], article_obj.title+f" -- {article['publisher']['title']} {month_num}/{day_num}/22", '0000FF', True)
     return all_topic_articles
+
+#creates paragraph that bolds name of query
+def bold_name(document,name:str,text:str):
+    delimiter = name.split()[-1].title()
+    split_paragraph = text.split(delimiter)
+
+    p = add_paragraph_without_spacing(document=document)
+    for index,text in enumerate(split_paragraph):
+        p.add_run(text,style='paragraph_text')
+        if index != len(split_paragraph)-1:
+            p.add_run('Biden',style='bold_text')
+
+def add_paragraph_without_spacing(document,text='',style=None):
+    if style==None:
+        p = document.add_paragraph(text)
+    else:
+        p = document.add_paragraph(text,style)
+    p.paragraph_format.space_before = docx.shared.Pt(0)
+    p.paragraph_format.space_after = docx.shared.Pt(0)
+    return p
 
 def main():
     document = Document()
 
+    #get name of person to query
     query = "adriano espaillat"
     area = "New York City"
     query = query.title()
     time_frame = "24h"
     topics_to_query = ['Housing','Education','Labor','Budget','Immigration','Guns']
 
-    p = document.add_paragraph(f"""CONGRESSMAN {query.split(" ")[1].upper()} MENTIONS:""")
-    p = document.add_paragraph()
+    #instantiate font styles
+    style = document.styles
+    title_style = style.add_style('title', docx.enum.style.WD_STYLE_TYPE.PARAGRAPH)
+    font = title_style.font
+    font.size = docx.shared.Pt(11)
+    font.name = 'Arial'
+    font.bold = True
+    font.underline = True
 
+    paragraph_style = style.add_style('paragraph_text', docx.enum.style.WD_STYLE_TYPE.CHARACTER)
+    paragraph_font = paragraph_style.font
+    paragraph_font.size = docx.shared.Pt(11)
+    paragraph_font.name = 'Arial'
 
+    bold_style = style.add_style('bold_text', docx.enum.style.WD_STYLE_TYPE.CHARACTER)
+    bold_font = bold_style.font
+    bold_font.size = docx.shared.Pt(11)
+    bold_font.name = 'Arial'
+    bold_font.bold = True
+
+    #title
+    p = add_paragraph_without_spacing(document=document,text=f"""CONGRESSMAN {query.split(" ")[1].upper()} MENTIONS:""",style='title')
+
+    #english clips
     for article in query_mentions(query=query,time_frame=time_frame,language='english'):
-        p = document.add_paragraph()
+        p = document.add_paragraph("",style='title')
+        p.paragraph_format.space_before = docx.shared.Pt(0)
+        p.paragraph_format.space_after = docx.shared.Pt(0)
         add_hyperlink(p, article.url, article.title+f" -- {article.publisher} {article.month_num}/{article.day_num}/22", '0000FF', True)
-        p = document.add_paragraph(article.lead_text)
+        p = add_paragraph_without_spacing(document=document)
+        p.add_run(article.lead_text,style='paragraph_text')
+        p = add_paragraph_without_spacing(document=document)
         for paragraph in article.mention_text:
-            p = document.add_paragraph(paragraph)
+            bold_name(document=document,name=query,text=paragraph)
+            p = add_paragraph_without_spacing(document=document)
+
+    #spanish clips
     for article in query_mentions(query=query,time_frame=time_frame,language='spanish'):
-        p = document.add_paragraph()
+        p = document.add_paragraph("",style='title')
+        p.paragraph_format.space_before = docx.shared.Pt(0)
+        p.paragraph_format.space_after = docx.shared.Pt(0)
         add_hyperlink(p, article.url, article.title+f" -- {article.publisher} {article.month_num}/{article.day_num}/22", '0000FF', True)
-        p = document.add_paragraph(article.lead_text)
+        p = add_paragraph_without_spacing(document=document)
+        p.add_run(article.lead_text,style='paragraph_text')
         for paragraph in article.mention_text:
-            p = document.add_paragraph(paragraph)
-            p = document.add_paragraph()
+            bold_name(document=document,name=query,text=paragraph)
+            p = add_paragraph_without_spacing(document=document)
+
+    #topic clips
     topic_query_results = query_topics(topics=topics_to_query,geographical_area=area)
+    p = add_paragraph_without_spacing(document=document,text="PRESS CLIPS:",style='title')
     for topic in topics_to_query:
-        p = document.add_paragraph(f"{topic.title()}:")
+        p = add_paragraph_without_spacing(document=document)
+        p.add_run("-",style='paragraph_text')
+        p = add_paragraph_without_spacing(document=document,text=f"{topic.title()}:",style='title')
         for article in topic_query_results[topic]:
-            p = document.add_paragraph()
+            p = document.add_paragraph("",style='title')
+            p.paragraph_format.space_before = docx.shared.Pt(0)
+            p.paragraph_format.space_after = docx.shared.Pt(0)
             add_hyperlink(p, article.url, article.title+f" -- {article.publisher} {article.month_num}/{article.day_num}/22", '0000FF', True)
 
     document.save(f'Press Clips {datetime.date.today()}.docx')
