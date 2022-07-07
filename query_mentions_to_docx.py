@@ -73,7 +73,7 @@ def query_mentions(query:str, time_frame:str, language:str) -> list:
     all_mentions_articles = []
 
     #instantiate GNews object
-    google_news = GNews(period=time_frame,max_results=5)
+    google_news = GNews(period=time_frame,max_results=10)
     google_news.language = language
     query_results = [] + google_news.get_news(query)
 
@@ -166,7 +166,7 @@ def bold_name(document,name:str,text:str):
     for index,text in enumerate(split_paragraph):
         p.add_run(text,style='paragraph_text')
         if index != len(split_paragraph)-1:
-            p.add_run('Biden',style='bold_text')
+            p.add_run(delimiter,style='bold_text')
 
 def add_paragraph_without_spacing(document,text='',style=None):
     if style==None:
