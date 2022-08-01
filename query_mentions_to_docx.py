@@ -93,7 +93,7 @@ def query_mentions(query:str, time_frame:str, language:str) -> list:
 
         #get date of article
         date_list = article['published date'].split(" ")
-        calendar_map = {'Jun':6,'Jul':7}
+        calendar_map = {'Jan':1,'Feb':2,'Mar':3,'Apr':4,'May':5,'Jun':6,'Jul':7,'Aug':8,'Sep':9,'Nov':11,'Dec':12}
         month_num = calendar_map[date_list[2]]
         day_num = date_list[1]
 
@@ -146,7 +146,7 @@ def query_topics(topics:list,geographical_area:str) -> list:
 
             #get date of article
             date_list = article['published date'].split(" ")
-            calendar_map = {'Jun':6,'Jul':7}
+            calendar_map = {'Jan':1,'Feb':2,'Mar':3,'Apr':4,'May':5,'Jun':6,'Jul':7,'Aug':8,'Sep':9,'Nov':11,'Dec':12}
             month_num = calendar_map[date_list[2]]
             day_num = date_list[1]
 
@@ -182,7 +182,7 @@ def main():
 
     #get name of person to query
     query = "adriano espaillat"
-    area = "New York City"
+    area = "new york city"
     query = query.title()
     time_frame = "24h"
     topics_to_query = ['Housing','Education','Labor','Budget','Immigration','Guns']
