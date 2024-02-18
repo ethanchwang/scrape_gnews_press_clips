@@ -1,0 +1,5 @@
+beautifulsoup4==4.9.3
+bs4==0.0.2
+deep-translator==1.11.4
+gnews==0.3.6
+newspaper3k==0.2.8

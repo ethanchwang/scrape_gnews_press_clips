@@ -1,0 +1,39 @@
+#+TITLE: Google News Scraper for Person-Specific News Clips
+
+* Overview
+  This project is designed to scrape Google News for news clips and articles related to a specific person of interest. It utilizes Python with libraries such as BeautifulSoup and requests to automate the collection of news from the web.
+
+* Installation
+  To set up this project on your local machine, follow these steps:
+
+  1. Clone the repository:
+     #+BEGIN_SRC shell
+     git clone https://github.com/ethanchwang/scrape_gnews_press_clips.git
+     #+END_SRC
+
+  2. Navigate to the project directory:
+     #+BEGIN_SRC shell
+     cd scrape_gnews_press_clips
+     #+END_SRC
+
+  3. Install required Python packages:
+     #+BEGIN_SRC shell
+     pip install -r requirements.txt
+     #+END_SRC
+
+* Usage
+  To start scraping Google News for news clips about the specified person, run the script with:
+
+  #+BEGIN_SRC shell
+  python clips_html.py --query chuck_schumer --area new_york --time_frame 48h --topics_to_query housing,education,labor --language span
+ish
+  #+END_SRC
+
+  You can also specify additional command-line arguments for customization. Refer to the script's help for more options:
+  
+  #+BEGIN_SRC shell
+  python scrape_google_news.py --help
+  #+END_SRC
+
+* Note on formatting
+I created this tool for use the in the particular communications office I was working in, so the formatting is tailored to what they were asking for.
